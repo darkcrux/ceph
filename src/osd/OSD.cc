@@ -4210,60 +4210,71 @@ void OSD::build_past_intervals_parallel()
     last_map = cur_map;
     cur_map = get_map(cur_epoch);
 
+    dout(10) << __func__ << " a__last_map " << last_map << dendl;
+    dout(10) << __func__ << " a__cur_map " << cur_map << dendl;
+
     for (map<PG*,pistate>::iterator i = pis.begin(); i != pis.end(); ++i) {
       PG *pg = i->first;
       pistate& p = i->second;
 
+      dout(10) << __func__ << "a__ building past interval for " << pg->info.pgid << dendl;
+
       if (cur_epoch < p.start || cur_epoch > p.end)
-	continue;
+      {
+        dout(10) << __func__ << "a__ epoch ok?" << dendl;
+        continue;
+      }
 
       vector<int> acting, up;
       int up_primary;
       int primary;
       pg_t pgid = pg->info.pgid.pgid;
       if (p.same_interval_since && last_map->get_pools().count(pgid.pool()))
-	pgid = pgid.get_ancestor(last_map->get_pg_num(pgid.pool()));
+        pgid = pgid.get_ancestor(last_map->get_pg_num(pgid.pool()));
       cur_map->pg_to_up_acting_osds(
-	pgid, &up, &up_primary, &acting, &primary);
+        pgid, &up, &up_primary, &acting, &primary);
 
       if (p.same_interval_since == 0) {
-	dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
-		 << " first map, acting " << acting
-		 << " up " << up << ", same_interval_since = " << cur_epoch << dendl;
-	p.same_interval_since = cur_epoch;
-	p.old_up = up;
-	p.old_acting = acting;
-	p.primary = primary;
-	p.up_primary = up_primary;
-	continue;
+        dout(10) << __func__ << " if same interval, then okay? " << dendl;
+        dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
+          << " first map, acting " << acting
+          << " up " << up << ", same_interval_since = " << cur_epoch << dendl;
+        p.same_interval_since = cur_epoch;
+        p.old_up = up;
+        p.old_acting = acting;
+        p.primary = primary;
+        p.up_primary = up_primary;
+        continue;
       }
       assert(last_map);
+
+      dout(10) << __func__ << "a__ building new interval" << dendl;
 
       boost::scoped_ptr<IsPGRecoverablePredicate> recoverable(
         pg->get_is_recoverable_predicate());
       std::stringstream debug;
       bool new_interval = PastIntervals::check_new_interval(
-	p.primary,
-	primary,
-	p.old_acting, acting,
-	p.up_primary,
-	up_primary,
-	p.old_up, up,
-	p.same_interval_since,
-	pg->info.history.last_epoch_clean,
-	cur_map, last_map,
-	pgid,
+        p.primary,
+        primary,
+        p.old_acting, acting,
+        p.up_primary,
+        up_primary,
+        p.old_up, up,
+        p.same_interval_since,
+        pg->info.history.last_epoch_clean,
+        cur_map, last_map,
+        pgid,
         recoverable.get(),
-	&pg->past_intervals,
-	&debug);
+        &pg->past_intervals,
+        &debug);
       if (new_interval) {
-	dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
-		 << " " << debug.str() << dendl;
-	p.old_up = up;
-	p.old_acting = acting;
-	p.primary = primary;
-	p.up_primary = up_primary;
-	p.same_interval_since = cur_epoch;
+        dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
+          << " " << debug.str() << dendl;
+        p.old_up = up;
+        p.old_acting = acting;
+        p.primary = primary;
+        p.up_primary = up_primary;
+        p.same_interval_since = cur_epoch;
       }
     }
   }
