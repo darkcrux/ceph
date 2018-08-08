@@ -4159,11 +4159,7 @@ void OSD::build_past_intervals_parallel()
         ++i) {
       PG *pg = i->second;
 
-      epoch_t epoch_history = pg->info.history;
-      epoch_t epoch_last_clean = pg->info.history.epoch_last_clean;
-
-      dout(10) << __func__ << pg->info.pgid << " epoch_created " << epoch_created << dendl;
-      dout(10) << __func__ << pg->info.pgid << " epoch_last_clean " << epoch_last_clean << dendl;
+      dout(10) << __func__ << pg->info.pgid << " epoch_history " << pg->info.history << dendl;
 
       // Ignore PGs only partially created (DNE)
       if (pg->info.dne()) {
@@ -4204,7 +4200,6 @@ void OSD::build_past_intervals_parallel()
     }
   }
   if (pis.empty()) {
-    dout(10) << __func__ << pg->info.pgid << " nothing to build" << dendl;
     return;
   }
 
@@ -4217,8 +4212,8 @@ void OSD::build_past_intervals_parallel()
     last_map = cur_map;
     cur_map = get_map(cur_epoch);
 
-    dout(10) << __func__ << pg->info.pgid << " a__last_map " << last_map << dendl;
-    dout(10) << __func__ << pg->info.pgid << " a__cur_map " << cur_map << dendl;
+    dout(10) << __func__ << " a__last_map " << last_map << dendl;
+    dout(10) << __func__ << " a__cur_map " << cur_map << dendl;
 
     for (map<PG*,pistate>::iterator i = pis.begin(); i != pis.end(); ++i) {
       PG *pg = i->first;
