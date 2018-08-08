@@ -4141,6 +4141,7 @@ void OSD::load_pgs()
 void OSD::build_past_intervals_parallel()
 {
   struct pistate {
+    PastIntervals old_pi;
     epoch_t start, end;
     vector<int> old_acting, old_up;
     epoch_t same_interval_since;
@@ -4203,17 +4204,25 @@ void OSD::build_past_intervals_parallel()
 
       dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
 	       << rpib.second << dendl;
+
+      // clearing the PG at this point
+      auto prev = pg->past_intervals;
+      pg->past_intervals.clear();
+
       pistate& p = pis[pg];
-      p.start = rpib.first;
-      p.end = rpib.second;
+      p.old_pi = prev;
+      p.start = cur_epoch;
+      p.end = end_epoch;
       p.same_interval_since = 0;
 
-      if (rpib.first < cur_epoch)
-        cur_epoch = rpib.first;
-      if (rpib.second > end_epoch)
-        end_epoch = rpib.second;
+      // if (rpib.first < cur_epoch)
+      //   cur_epoch = rpib.first;
+      // if (rpib.second > end_epoch)
+      //   end_epoch = rpib.second;
     }
   }
+
+  // nothing to rebuild.
   if (pis.empty()) {
     return;
   }
@@ -4227,20 +4236,15 @@ void OSD::build_past_intervals_parallel()
     last_map = cur_map;
     cur_map = get_map(cur_epoch);
 
-    dout(10) << __func__ << " a__last_map " << last_map << dendl;
-    dout(10) << __func__ << " a__cur_map " << cur_map << dendl;
-
     for (map<PG*,pistate>::iterator i = pis.begin(); i != pis.end(); ++i) {
       PG *pg = i->first;
       pistate& p = i->second;
 
       dout(10) << __func__ << "a__ building past interval for " << pg->info.pgid << dendl;
 
-      if (cur_epoch < p.start || cur_epoch > p.end)
-      {
-        dout(10) << __func__ << "a__ epoch ok?" << dendl;
-        continue;
-      }
+      // no longer needed as we are looping through everything
+      // if (cur_epoch < p.start || cur_epoch > p.end)
+      //   continue;
 
       vector<int> acting, up;
       int up_primary;
@@ -4264,11 +4268,6 @@ void OSD::build_past_intervals_parallel()
       }
       assert(last_map);
 
-      dout(10) << __func__ << pg->info.pgid << " a__ building new interval" << dendl;
-
-      // this might be where we adjust epochs (pg->past_intervals? what does this show?)
-      dout(10) << __func__ << pg->past_intervals << "a__ past_intervals" << dendl;
-
       boost::scoped_ptr<IsPGRecoverablePredicate> recoverable(
         pg->get_is_recoverable_predicate());
       std::stringstream debug;
@@ -4287,7 +4286,6 @@ void OSD::build_past_intervals_parallel()
         &pg->past_intervals,
         &debug);
       if (new_interval) {
-        dout(10) << __func__ << " this is a new interval pg " << pg->info.pgid << dendl;
         dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
           << " " << debug.str() << dendl;
         p.old_up = up;
@@ -4312,7 +4310,15 @@ void OSD::build_past_intervals_parallel()
       // Fix it
       pg->info.history.same_interval_since = p.same_interval_since;
     }
+
+    dout(10) << __func__ << " old_pi: " << p.old_pi << dendl;
+    dout(10) << __func__ << " new_pi: " << pg->past_intervals << dendl;
   }
+
+  // we exit here for now?
+  exit(1);
+
+
 
   // write info only at the end.  this is necessary because we check
   // whether the past_intervals go far enough back or forward in time,
