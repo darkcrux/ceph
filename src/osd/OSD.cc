@@ -4316,7 +4316,7 @@ void OSD::build_past_intervals_parallel()
   }
 
   // we exit here for now?
-  exit(1);
+  // exit(1);
 
 
 
