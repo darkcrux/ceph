@@ -4167,6 +4167,10 @@ void OSD::build_past_intervals_parallel()
         continue;
       }
 
+      dout(10) << __func__ << " " << pg->info.pgid << " last epoch clean " << pg->info.history.last_epoch_clean << dendl;
+      dout(10) << __func__ << " " << pg->info.pgid << " epoch pool created " << pg->info.history.epoch_pool_created << dendl;
+      dout(10) << __func__ << " " << pg->info.pgid << " superblock oldest map " << pg->superblock.oldest_map << dendl;
+
       auto rpib = pg->get_required_past_interval_bounds(
         pg->info,
         superblock.oldest_map);
@@ -4250,7 +4254,7 @@ void OSD::build_past_intervals_parallel()
       }
       assert(last_map);
 
-      dout(10) << __func__ << pg->info.pgid << "a__ building new interval" << dendl;
+      dout(10) << __func__ << pg->info.pgid << " a__ building new interval" << dendl;
 
       // this might be where we adjust epochs (pg->past_intervals? what does this show?)
       dout(10) << __func__ << pg->past_intervals << "a__ past_intervals" << dendl;
