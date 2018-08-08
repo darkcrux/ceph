@@ -4171,6 +4171,9 @@ void OSD::build_past_intervals_parallel()
       dout(10) << __func__ << " " << pg->info.pgid << " epoch pool created " << pg->info.history.epoch_pool_created << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " superblock oldest map " << superblock.oldest_map << dendl;
 
+      dout(10) << __func__ << " " << pg->info.pgid << "epoch created is larger than last epoch clean, will adjust" << dendl;
+      pg->info.history.epoch_pool_created = MIN(pg->info.history.last_epoch_clean, pg->info.history.epoch_pool_created);
+
       auto rpib = pg->get_required_past_interval_bounds(
         pg->info,
         superblock.oldest_map);
@@ -4249,7 +4252,6 @@ void OSD::build_past_intervals_parallel()
         pgid, &up, &up_primary, &acting, &primary);
 
       if (p.same_interval_since == 0) {
-        dout(10) << __func__ << pg->info.pgid << " if same interval, then okay? " << dendl;
         dout(10) << __func__ << pg->info.pgid << " epoch " << cur_epoch << " pg " << pg->info.pgid
           << " first map, acting " << acting
           << " up " << up << ", same_interval_since = " << cur_epoch << dendl;
