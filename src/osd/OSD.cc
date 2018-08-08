@@ -4159,7 +4159,7 @@ void OSD::build_past_intervals_parallel()
         ++i) {
       PG *pg = i->second;
 
-      epoch_t epoch_created = pg->info.history.epoch_created;
+      epoch_t epoch_history = pg->info.history;
       epoch_t epoch_last_clean = pg->info.history.epoch_last_clean;
 
       dout(10) << __func__ << pg->info.pgid << " epoch_created " << epoch_created << dendl;
@@ -4278,7 +4278,7 @@ void OSD::build_past_intervals_parallel()
         &pg->past_intervals,
         &debug);
       if (new_interval) {
-        dout(10) << __func__ << " this is a new interval pg " << pg->info.pgid;
+        dout(10) << __func__ << " this is a new interval pg " << pg->info.pgid << dendl;
         dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
           << " " << debug.str() << dendl;
         p.old_up = up;
