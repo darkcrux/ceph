@@ -4159,28 +4159,35 @@ void OSD::build_past_intervals_parallel()
         ++i) {
       PG *pg = i->second;
 
+      epoch_t epoch_created = pg->info.history.epoch_created;
+      epoch_t epoch_last_clean = pg->info.history.epoch_last_clean;
+
+      dout(10) << __func__ << pg->info.pgid << " epoch_created " << epoch_created << dendl;
+      dout(10) << __func__ << pg->info.pgid << " epoch_last_clean " << epoch_last_clean << dendl;
+
       // Ignore PGs only partially created (DNE)
       if (pg->info.dne()) {
-	continue;
+        dout(10) << __func__ << pg->info.pgid << " partially created " << dendl;
+        continue;
       }
 
       auto rpib = pg->get_required_past_interval_bounds(
-	pg->info,
-	superblock.oldest_map);
+        pg->info,
+        superblock.oldest_map);
       if (rpib.first >= rpib.second && pg->past_intervals.empty()) {
         if (pg->info.history.same_interval_since == 0) {
           pg->info.history.same_interval_since = rpib.second;
-	}
-	continue;
+        }
+        continue;
       } else {
-	auto apib = pg->past_intervals.get_bounds();
-	if (apib.second >= rpib.second &&
-	    apib.first <= rpib.first) {
-	  if (pg->info.history.same_interval_since == 0) {
-	    pg->info.history.same_interval_since = rpib.second;
-	  }
-	  continue;
-	}
+      auto apib = pg->past_intervals.get_bounds();
+      if (apib.second >= rpib.second &&
+        apib.first <= rpib.first) {
+          if (pg->info.history.same_interval_since == 0) {
+            pg->info.history.same_interval_since = rpib.second;
+          }
+          continue;
+        }
       }
 
       dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
@@ -4197,7 +4204,7 @@ void OSD::build_past_intervals_parallel()
     }
   }
   if (pis.empty()) {
-    dout(10) << __func__ << " nothing to build" << dendl;
+    dout(10) << __func__ << pg->info.pgid << " nothing to build" << dendl;
     return;
   }
 
@@ -4210,8 +4217,8 @@ void OSD::build_past_intervals_parallel()
     last_map = cur_map;
     cur_map = get_map(cur_epoch);
 
-    dout(10) << __func__ << " a__last_map " << last_map << dendl;
-    dout(10) << __func__ << " a__cur_map " << cur_map << dendl;
+    dout(10) << __func__ << pg->info.pgid << " a__last_map " << last_map << dendl;
+    dout(10) << __func__ << pg->info.pgid << " a__cur_map " << cur_map << dendl;
 
     for (map<PG*,pistate>::iterator i = pis.begin(); i != pis.end(); ++i) {
       PG *pg = i->first;
@@ -4235,8 +4242,8 @@ void OSD::build_past_intervals_parallel()
         pgid, &up, &up_primary, &acting, &primary);
 
       if (p.same_interval_since == 0) {
-        dout(10) << __func__ << " if same interval, then okay? " << dendl;
-        dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
+        dout(10) << __func__ << pg->info.pgid << " if same interval, then okay? " << dendl;
+        dout(10) << __func__ << pg->info.pgid << " epoch " << cur_epoch << " pg " << pg->info.pgid
           << " first map, acting " << acting
           << " up " << up << ", same_interval_since = " << cur_epoch << dendl;
         p.same_interval_since = cur_epoch;
@@ -4248,7 +4255,10 @@ void OSD::build_past_intervals_parallel()
       }
       assert(last_map);
 
-      dout(10) << __func__ << "a__ building new interval" << dendl;
+      dout(10) << __func__ << pg->info.pgid << "a__ building new interval" << dendl;
+
+      // this might be where we adjust epochs (pg->past_intervals? what does this show?)
+      dout(10) << __func__ << pg->past_intervals << "a__ past_intervals" << dendl;
 
       boost::scoped_ptr<IsPGRecoverablePredicate> recoverable(
         pg->get_is_recoverable_predicate());
@@ -4268,6 +4278,7 @@ void OSD::build_past_intervals_parallel()
         &pg->past_intervals,
         &debug);
       if (new_interval) {
+        dout(10) << __func__ << " this is a new interval pg " << pg->info.pgid
         dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
           << " " << debug.str() << dendl;
         p.old_up = up;
