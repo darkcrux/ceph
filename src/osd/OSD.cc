@@ -4151,8 +4151,8 @@ void OSD::build_past_intervals_parallel()
   map<PG*,pistate> pis;
 
   // calculate junction of map range
-  epoch_t end_epoch = superblock.oldest_map;
-  epoch_t cur_epoch = superblock.newest_map;
+  epoch_t cur_epoch = superblock.oldest_map;
+  epoch_t end_epoch = superblock.newest_map;
   {
     RWLock::RLocker l(pg_map_lock);
     for (ceph::unordered_map<spg_t, PG*>::iterator i = pg_map.begin();
@@ -4172,8 +4172,8 @@ void OSD::build_past_intervals_parallel()
       dout(10) << __func__ << " " << pg->info.pgid << " epoch pool created " << pg->info.history.epoch_pool_created << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " superblock oldest map " << superblock.oldest_map << dendl;
 
-      dout(10) << __func__ << " " << pg->info.pgid << "epoch created is larger than last epoch clean, will adjust" << dendl;
-      pg->info.history.epoch_pool_created = MIN(pg->info.history.last_epoch_clean, pg->info.history.epoch_pool_created);
+      // dout(10) << __func__ << " " << pg->info.pgid << "epoch created is larger than last epoch clean, will adjust" << dendl;
+      // pg->info.history.epoch_pool_created = MIN(pg->info.history.last_epoch_clean, pg->info.history.epoch_pool_created);
 
       auto rpib = pg->get_required_past_interval_bounds(
         pg->info,
