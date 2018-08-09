@@ -4186,7 +4186,7 @@ void OSD::build_past_intervals_parallel()
         if (pg->info.history.same_interval_since == 0) {
           pg->info.history.same_interval_since = rpib.second;
         }
-        continue;
+        // continue;
       } else {
       auto apib = pg->past_intervals.get_bounds();
 
@@ -4198,7 +4198,7 @@ void OSD::build_past_intervals_parallel()
           if (pg->info.history.same_interval_since == 0) {
             pg->info.history.same_interval_since = rpib.second;
           }
-          continue;
+          // continue;
         }
       }
 
