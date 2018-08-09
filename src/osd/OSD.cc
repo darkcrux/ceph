@@ -4149,8 +4149,6 @@ void OSD::build_past_intervals_parallel()
   };
   map<PG*,pistate> pis;
 
-  dout()
-
   // calculate junction of map range
   epoch_t cur_epoch = superblock.oldest_map;
   epoch_t end_epoch = superblock.newest_map;
@@ -4207,7 +4205,7 @@ void OSD::build_past_intervals_parallel()
 
       
 
-      dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
+      dout(10) << pg->info.pgid << " needs " << rpib.first << "-";
 	       << rpib.second << dendl;
 
       // clearing the PG at this point
@@ -4290,29 +4288,32 @@ void OSD::build_past_intervals_parallel()
       boost::scoped_ptr<IsPGRecoverablePredicate> recoverable(
         pg->get_is_recoverable_predicate());
       std::stringstream debug;
-      bool new_interval = PastIntervals::check_new_interval(
-        p.primary,
-        primary,
-        p.old_acting, acting,
-        p.up_primary,
-        up_primary,
-        p.old_up, up,
-        p.same_interval_since,
-        pg->info.history.last_epoch_clean,
-        cur_map, last_map,
-        pgid,
-        recoverable.get(),
-        &pg->past_intervals,
-        &debug);
-      if (new_interval) {
-        dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
-          << " " << debug.str() << dendl;
+
+      // this is where it fails assert(interval.last > last)
+
+      // bool new_interval = PastIntervals::check_new_interval(
+      //   p.primary,
+      //   primary,
+      //   p.old_acting, acting,
+      //   p.up_primary,
+      //   up_primary,
+      //   p.old_up, up,
+      //   p.same_interval_since,
+      //   pg->info.history.last_epoch_clean,
+      //   cur_map, last_map,
+      //   pgid,
+      //   recoverable.get(),
+      //   &pg->past_intervals,
+      //   &debug);
+      // if (new_interval) {
+      //   dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
+      //     << " " << debug.str() << dendl;
         p.old_up = up;
         p.old_acting = acting;
         p.primary = primary;
         p.up_primary = up_primary;
         p.same_interval_since = cur_epoch;
-      }
+      // }
     }
   }
 
