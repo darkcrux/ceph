@@ -804,49 +804,49 @@ bool PG::needs_backfill() const
 
 void PG::check_past_interval_bounds() const
 {
-  auto rpib = get_required_past_interval_bounds(
-    info,
-    osd->get_superblock().oldest_map);
-  if (rpib.first >= rpib.second) {
-    if (!past_intervals.empty()) {
-      osd->clog->error() << info.pgid << " required past_interval bounds are"
-			 << " empty [" << rpib << ") but past_intervals is not: "
-			 << past_intervals;
-      derr << info.pgid << " required past_interval bounds are"
-	   << " empty [" << rpib << ") but past_intervals is not: "
-	   << past_intervals << dendl;
-    }
-  } else {
-    if (past_intervals.empty()) {
-      osd->clog->error() << info.pgid << " required past_interval bounds are"
-			 << " not empty [" << rpib << ") but past_intervals "
-			 << past_intervals << " is empty";
-      derr << info.pgid << " required past_interval bounds are"
-	   << " not empty [" << rpib << ") but past_intervals "
-	   << past_intervals << " is empty" << dendl;
-      assert(!past_intervals.empty());
-    }
+  // auto rpib = get_required_past_interval_bounds(
+  //   info,
+  //   osd->get_superblock().oldest_map);
+  // if (rpib.first >= rpib.second) {
+  //   if (!past_intervals.empty()) {
+  //     osd->clog->error() << info.pgid << " required past_interval bounds are"
+	// 		 << " empty [" << rpib << ") but past_intervals is not: "
+	// 		 << past_intervals;
+  //     derr << info.pgid << " required past_interval bounds are"
+	//    << " empty [" << rpib << ") but past_intervals is not: "
+	//    << past_intervals << dendl;
+  //   }
+  // } else {
+  //   if (past_intervals.empty()) {
+  //     osd->clog->error() << info.pgid << " required past_interval bounds are"
+	// 		 << " not empty [" << rpib << ") but past_intervals "
+	// 		 << past_intervals << " is empty";
+  //     derr << info.pgid << " required past_interval bounds are"
+	//    << " not empty [" << rpib << ") but past_intervals "
+	//    << past_intervals << " is empty" << dendl;
+  //     assert(!past_intervals.empty());
+  //   }
 
-    auto apib = past_intervals.get_bounds();
-    if (apib.first > rpib.first) {
-      osd->clog->error() << info.pgid << " past_intervals [" << apib
-			 << ") start interval does not contain the required"
-			 << " bound [" << rpib << ") start";
-      derr << info.pgid << " past_intervals [" << apib
-	   << ") start interval does not contain the required"
-	   << " bound [" << rpib << ") start" << dendl;
-      assert(0 == "past_interval start interval mismatch");
-    }
-    if (apib.second != rpib.second) {
-      osd->clog->error() << info.pgid << " past_interal bound [" << apib
-			 << ") end does not match required [" << rpib
-			 << ") end";
-      derr << info.pgid << " past_interal bound [" << apib
-	   << ") end does not match required [" << rpib
-	   << ") end" << dendl;
-      assert(0 == "past_interval end mismatch");
-    }
-  }
+  //   auto apib = past_intervals.get_bounds();
+  //   if (apib.first > rpib.first) {
+  //     osd->clog->error() << info.pgid << " past_intervals [" << apib
+	// 		 << ") start interval does not contain the required"
+	// 		 << " bound [" << rpib << ") start";
+  //     derr << info.pgid << " past_intervals [" << apib
+	//    << ") start interval does not contain the required"
+	//    << " bound [" << rpib << ") start" << dendl;
+  //     assert(0 == "past_interval start interval mismatch");
+  //   }
+  //   if (apib.second != rpib.second) {
+  //     osd->clog->error() << info.pgid << " past_interal bound [" << apib
+	// 		 << ") end does not match required [" << rpib
+	// 		 << ") end";
+  //     derr << info.pgid << " past_interal bound [" << apib
+	//    << ") end does not match required [" << rpib
+	//    << ") end" << dendl;
+  //     assert(0 == "past_interval end mismatch");
+  //   }
+  // }
 }
 
 bool PG::adjust_need_up_thru(const OSDMapRef osdmap)
