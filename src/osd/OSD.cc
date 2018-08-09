@@ -4151,8 +4151,8 @@ void OSD::build_past_intervals_parallel()
   map<PG*,pistate> pis;
 
   // calculate junction of map range
-  epoch_t cur_epoch = superblock.oldest_map;
-  epoch_t end_epoch = superblock.newest_map;
+  epoch_t end_epoch = superblock.oldest_map;
+  epoch_t cur_epoch = superblock.newest_map;
   {
     RWLock::RLocker l(pg_map_lock);
     for (ceph::unordered_map<spg_t, PG*>::iterator i = pg_map.begin();
@@ -4211,14 +4211,20 @@ void OSD::build_past_intervals_parallel()
 
       pistate& p = pis[pg];
       p.old_pi = prev;
-      p.start = cur_epoch;
+      p.start = superblock.oldest_map;
       p.end = end_epoch;
       p.same_interval_since = 0;
 
       // if (rpib.first < cur_epoch)
       //   cur_epoch = rpib.first;
-      // if (rpib.second > end_epoch)
-      //   end_epoch = rpib.second;
+
+      // we start from the oldest map
+      cur_epoch = superblock.oldest_map;
+
+      // and end at either oldest_map or the required past interval bound
+      if (rpib.second > end_epoch) {
+        end_epoch = rpib.second;
+      }
     }
   }
 
