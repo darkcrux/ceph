@@ -4209,7 +4209,6 @@ void OSD::build_past_intervals_parallel()
 
       // Find the largest ending point
       end_epoch = MAX(rpib.second, superblock.newest_map);
-      end_epoch = MAX(end_epoch, );
 
 
       dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
