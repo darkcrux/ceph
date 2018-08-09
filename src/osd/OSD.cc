@@ -4179,6 +4179,7 @@ void OSD::build_past_intervals_parallel()
       auto rpib = pg->get_required_past_interval_bounds(
         pg->info,
         superblock.oldest_map);
+      auto apib = pg->past_intervals.get_bounds();
 
       dout(10) << __func__ << " " << pg->info.pgid << " required interval start " << rpib.first << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " required interval end " << rpib.second << dendl;
@@ -4189,7 +4190,6 @@ void OSD::build_past_intervals_parallel()
         }
         continue;
       } else {
-      auto apib = pg->past_intervals.get_bounds();
 
       dout(10) << __func__ << " " << pg->info.pgid << " actual interval start " << apib.first << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " actual interval end " << apib.second << dendl;
@@ -4208,8 +4208,8 @@ void OSD::build_past_intervals_parallel()
       cur_epoch = MIN(cur_epoch, superblock.oldest_map);
 
       // Find the largest ending point
-      end_epoch = MAX(rpib.second, apib.second);
-      end_epoch = MAX(end_epoch, superblock.newest_map);
+      end_epoch = MAX(rpib.second, superblock.newest_map);
+      end_epoch = MAX(end_epoch, );
 
 
       dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
