@@ -4264,7 +4264,7 @@ void OSD::build_past_intervals_parallel()
         p.old_acting = acting;
         p.primary = primary;
         p.up_primary = up_primary;
-        continue;
+        // continue;
       }
       assert(last_map);
 
