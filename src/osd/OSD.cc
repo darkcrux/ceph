@@ -4202,6 +4202,15 @@ void OSD::build_past_intervals_parallel()
         }
       }
 
+      // Find the smallest starting point
+      cur_epoch = MIN(pg->info.history.last_epoch_clean, pg->info.history.epoch_pool_created);
+      cur_epoch = MIN(cur_epoch, superblock.oldest_map);
+
+      // Find the largest ending point
+      end_epoch = MAX(rpib.second, apib.second);
+      end_epoch = MAX(end_epoch, superblock.newest_map);
+
+
       dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
 	       << rpib.second << dendl;
 
@@ -4316,7 +4325,7 @@ void OSD::build_past_intervals_parallel()
   }
 
   // we exit here for now?
-  exit(1);
+  // exit(1);
 
 
 
