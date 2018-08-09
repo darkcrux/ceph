@@ -4169,6 +4169,7 @@ void OSD::build_past_intervals_parallel()
       }
 
       dout(10) << __func__ << " " << pg->info.pgid << " last epoch clean " << pg->info.history.last_epoch_clean << dendl;
+      dout(10) << __func__ << " " << pg->info.pgid << " same interval since " << pg->info.history.same_interval_since << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " epoch pool created " << pg->info.history.epoch_pool_created << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " superblock oldest map " << superblock.oldest_map << dendl;
 
