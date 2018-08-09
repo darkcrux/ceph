@@ -4170,6 +4170,7 @@ void OSD::build_past_intervals_parallel()
 
       dout(10) << __func__ << " " << pg->info.pgid << " last epoch clean " << pg->info.history.last_epoch_clean << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " epoch pool created " << pg->info.history.epoch_pool_created << dendl;
+      dout(10) << __func__ << " " << pg->info.pgid << " epoch created " << pg->info.history.epoch_created << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " superblock oldest map " << superblock.oldest_map << dendl;
 
       // dout(10) << __func__ << " " << pg->info.pgid << "epoch created is larger than last epoch clean, will adjust" << dendl;
@@ -4203,7 +4204,7 @@ void OSD::build_past_intervals_parallel()
       }
 
       // Find the smallest starting point
-      cur_epoch = MIN(pg->info.history.last_epoch_clean, pg->info.history.epoch_pool_created);
+      cur_epoch = MIN(pg->info.epoch_created, pg->info.history.epoch_pool_created);
       cur_epoch = MIN(cur_epoch, superblock.oldest_map);
 
       // Find the largest ending point
