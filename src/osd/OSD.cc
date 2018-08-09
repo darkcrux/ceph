@@ -4205,7 +4205,7 @@ void OSD::build_past_intervals_parallel()
 
       
 
-      dout(10) << pg->info.pgid << " needs " << rpib.first << "-";
+      dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
 	       << rpib.second << dendl;
 
       // clearing the PG at this point
