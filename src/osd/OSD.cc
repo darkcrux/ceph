@@ -4271,6 +4271,8 @@ void OSD::build_past_intervals_parallel()
       }
       assert(last_map);
 
+      dout(10) << __func__ << " Checking New Interval: " << pg->info.pgid << dendl;
+
       boost::scoped_ptr<IsPGRecoverablePredicate> recoverable(
         pg->get_is_recoverable_predicate());
       std::stringstream debug;
@@ -4288,6 +4290,9 @@ void OSD::build_past_intervals_parallel()
         recoverable.get(),
         &pg->past_intervals,
         &debug);
+
+      dout(10) << __func__ << " Is new interval? " << pg->info.pgid << " " << new_interval << dendl;
+
       if (new_interval) {
         dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
           << " " << debug.str() << dendl;
@@ -4296,6 +4301,7 @@ void OSD::build_past_intervals_parallel()
         p.primary = primary;
         p.up_primary = up_primary;
         p.same_interval_since = cur_epoch;
+        dout(10) << __func__ << " new same_interval_since: " << pg->info.pgid << " " << cur_epoch << dendl;
       }
     }
   }
@@ -4310,8 +4316,12 @@ void OSD::build_past_intervals_parallel()
       assert(p.same_interval_since);
       dout(10) << __func__ << " fix same_interval_since " << p.same_interval_since << " pg " << *pg << dendl;
       dout(10) << __func__ << " past_intervals " << pg->past_intervals << dendl;
+      
       // Fix it
+      dout(10) << __func__ << " pgid: " << pg->info.pgid << " history.same_interval_since " << pg->info.history.same_interval_since << dendl;
+      dout(10) << __func__ << " pgid: " << pg->info.pgid << " p.same_interval_since " << p.same_interval_since << dendl;
       pg->info.history.same_interval_since = p.same_interval_since;
+      dout(10) << __func__ << " pgid: " << pg->info.pgid << " new history.same_interval_since " << pg->info.history.same_interval_since << dendl;
     }
 
     dout(10) << __func__ << " old_pi: " << p.old_pi << dendl;
