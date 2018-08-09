@@ -3657,7 +3657,7 @@ bool PastIntervals::check_new_interval(
       if (out)
 	*out << __func__ << " " << i << " : acting set is too small" << std::endl;
     }
-    dout(10) << __func__ << " interval.last " << old_pg_pool.ec_pool() << " last " << i << dendl;
+    *out << __func__ << " interval.last " << old_pg_pool.ec_pool() << " last " << i << std::endl;
     past_intervals->past_intervals->add_interval(old_pg_pool.ec_pool(), i);
     return true;
   } else {
