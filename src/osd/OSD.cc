@@ -4205,8 +4205,7 @@ void OSD::build_past_intervals_parallel()
 
       
 
-      dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
-	       << rpib.second << dendl;
+      dout(10) << pg->info.pgid << " needs " << rpib.first << "-" << rpib.second << dendl;
 
       // clearing the PG at this point
       auto prev = pg->past_intervals;
@@ -4285,8 +4284,7 @@ void OSD::build_past_intervals_parallel()
       }
       assert(last_map);
 
-      boost::scoped_ptr<IsPGRecoverablePredicate> recoverable(
-        pg->get_is_recoverable_predicate());
+      boost::scoped_ptr<IsPGRecoverablePredicate> recoverable(pg->get_is_recoverable_predicate());
       std::stringstream debug;
 
       // this is where it fails assert(interval.last > last)
@@ -4305,9 +4303,9 @@ void OSD::build_past_intervals_parallel()
       //   recoverable.get(),
       //   &pg->past_intervals,
       //   &debug);
-      // if (new_interval) {
-      //   dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
-      //     << " " << debug.str() << dendl;
+      if (new_interval) {
+        dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
+          << " " << debug.str() << dendl;
         p.old_up = up;
         p.old_acting = acting;
         p.primary = primary;
