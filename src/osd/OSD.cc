@@ -4220,11 +4220,7 @@ void OSD::build_past_intervals_parallel()
 
       // we start from the oldest map
       cur_epoch = superblock.oldest_map;
-
-      // and end at either oldest_map or the required past interval bound
-      if (rpib.second > end_epoch) {
-        end_epoch = rpib.second;
-      }
+      end_epoch = pg->info.history.same_interval_since;
     }
   }
 
