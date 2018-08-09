@@ -807,6 +807,11 @@ void PG::check_past_interval_bounds() const
   auto rpib = get_required_past_interval_bounds(
     info,
     osd->get_superblock().oldest_map);
+
+    dout(10) << __func__ << " at check_past_interval_bounds " << info.pgid << " required interval start " << rpib.first << dendl;
+    dout(10) << __func__ << " at check_past_interval_bounds " << info.pgid << " required interval end " << rpib.second << dendl;
+
+
   if (rpib.first >= rpib.second) {
     if (!past_intervals.empty()) {
       osd->clog->error() << info.pgid << " required past_interval bounds are"
@@ -828,6 +833,10 @@ void PG::check_past_interval_bounds() const
     }
 
     auto apib = past_intervals.get_bounds();
+
+    dout(10) << __func__ << " at check_past_interval_bounds " << info.pgid << " actual interval start " << apib.first << dendl;
+    dout(10) << __func__ << " at check_past_interval_bounds " << info.pgid << " actual interval end " << apib.second << dendl;
+    
     if (apib.first > rpib.first) {
       osd->clog->error() << info.pgid << " past_intervals [" << apib
 			 << ") start interval does not contain the required"

@@ -4123,9 +4123,8 @@ void OSD::load_pgs()
     }
   }
 
-  if (g_conf->get_val<bool>("osd_build_past_intervals_parallel")) {
-    build_past_intervals_parallel();
-  }
+  build_past_intervals_parallel();
+
 }
 
 
@@ -4153,6 +4152,8 @@ void OSD::build_past_intervals_parallel()
   // calculate junction of map range
   epoch_t cur_epoch = superblock.oldest_map;
   epoch_t end_epoch = superblock.newest_map;
+
+  dout(10) << __func__ << " cur_epoch " << cur_epoch << " end_epoch " << end_epoch << dendl;
   {
     RWLock::RLocker l(pg_map_lock);
     for (ceph::unordered_map<spg_t, PG*>::iterator i = pg_map.begin();
@@ -4165,7 +4166,7 @@ void OSD::build_past_intervals_parallel()
       // Ignore PGs only partially created (DNE)
       if (pg->info.dne()) {
         dout(10) << __func__ << pg->info.pgid << " partially created " << dendl;
-        continue;
+        // continue;
       }
 
       dout(10) << __func__ << " " << pg->info.pgid << " last epoch clean " << pg->info.history.last_epoch_clean << dendl;
@@ -4202,6 +4203,8 @@ void OSD::build_past_intervals_parallel()
         }
       }
 
+      
+
       dout(10) << pg->info.pgid << " needs " << rpib.first << "-"
 	       << rpib.second << dendl;
 
@@ -4215,6 +4218,8 @@ void OSD::build_past_intervals_parallel()
       p.end = end_epoch;
       p.same_interval_since = 0;
 
+      dout(10) << __func__ << " Preparing to recreate past intervals of " << pg->info.pgid << dendl;
+      
       // if (rpib.first < cur_epoch)
       //   cur_epoch = rpib.first;
       // if (rpib.second > end_epoch)
@@ -4313,6 +4318,16 @@ void OSD::build_past_intervals_parallel()
 
     dout(10) << __func__ << " old_pi: " << p.old_pi << dendl;
     dout(10) << __func__ << " new_pi: " << pg->past_intervals << dendl;
+
+    auto rpib = pg->get_required_past_interval_bounds(pg->info, superblock.oldest_map);
+
+    dout(10) << __func__ << " after build_past_interval " << pg->info.pgid << " required interval start " << rpib.first << dendl;
+    dout(10) << __func__ << " after build_past_interval " << pg->info.pgid << " required interval end " << rpib.second << dendl;
+      
+    auto apib = pg->past_intervals.get_bounds();
+
+    dout(10) << __func__ << " after build_past_interval " << pg->info.pgid << " actual interval start " << apib.first << dendl;
+    dout(10) << __func__ << " after build_past_interval " << pg->info.pgid << " actual interval end " << apib.second << dendl;
   }
 
   // we exit here for now?
