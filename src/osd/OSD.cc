@@ -4219,8 +4219,9 @@ void OSD::build_past_intervals_parallel()
       // if (rpib.first < cur_epoch)
       //   cur_epoch = rpib.first;
 
-      // we start from the oldest map
-      cur_epoch = superblock.oldest_map;
+      // we start from the epoch created
+      cur_epoch = pg->info.history.epoch_created;
+      // until just before same_interval_since
       end_epoch = pg->info.history.same_interval_since - 1;
     }
   }
