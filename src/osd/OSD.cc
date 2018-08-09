@@ -4149,6 +4149,8 @@ void OSD::build_past_intervals_parallel()
   };
   map<PG*,pistate> pis;
 
+  dout()
+
   // calculate junction of map range
   epoch_t cur_epoch = superblock.oldest_map;
   epoch_t end_epoch = superblock.newest_map;
@@ -4216,6 +4218,7 @@ void OSD::build_past_intervals_parallel()
       p.old_pi = prev;
       p.start = cur_epoch;
       p.end = end_epoch;
+      // same_interval_since set to zero since we're creating the interval? 
       p.same_interval_since = 0;
 
       dout(10) << __func__ << " Preparing to recreate past intervals of " << pg->info.pgid << dendl;
@@ -4227,39 +4230,50 @@ void OSD::build_past_intervals_parallel()
     }
   }
 
-  // nothing to rebuild.
-  if (pis.empty()) {
-    return;
-  }
+  // nothing to rebuild. <--- no we will always build
+  // if (pis.empty()) {
+  //   return;
+  // }
 
-  dout(1) << __func__ << " over " << cur_epoch << "-" << end_epoch << dendl;
+  dout(10) << __func__ << " over " << cur_epoch << "-" << end_epoch << dendl;
   assert(cur_epoch <= end_epoch);
 
   OSDMapRef cur_map, last_map;
+
+  // Looping through each epoch.
   for ( ; cur_epoch <= end_epoch; cur_epoch++) {
     dout(10) << __func__ << " epoch " << cur_epoch << dendl;
     last_map = cur_map;
     cur_map = get_map(cur_epoch);
 
+    // iterating through all PGs.
     for (map<PG*,pistate>::iterator i = pis.begin(); i != pis.end(); ++i) {
       PG *pg = i->first;
       pistate& p = i->second;
 
       dout(10) << __func__ << "a__ building past interval for " << pg->info.pgid << dendl;
 
-      // no longer needed as we are looping through everything
-      // if (cur_epoch < p.start || cur_epoch > p.end)
-      //   continue;
-
       vector<int> acting, up;
       int up_primary;
       int primary;
       pg_t pgid = pg->info.pgid.pgid;
-      if (p.same_interval_since && last_map->get_pools().count(pgid.pool()))
+
+      dout(10) << __func__ << " pgid: " << pgid << " same_interval_since " << p.same_interval_since << dendl;
+
+      // p.same_interval_since will always be zero? This could change the pgid? :o
+      if (p.same_interval_since && last_map->get_pools().count(pgid.pool())) {
         pgid = pgid.get_ancestor(last_map->get_pg_num(pgid.pool()));
+        dout(10) << __func__ << " pgid_new?: " << pgid << dendl;
+      }
+
+
+
+
+      // gets the UP and Acting OSDs based on the pgid
       cur_map->pg_to_up_acting_osds(
         pgid, &up, &up_primary, &acting, &primary);
 
+      // it is still zero // code might be useless now?
       if (p.same_interval_since == 0) {
         dout(10) << __func__ << pg->info.pgid << " epoch " << cur_epoch << " pg " << pg->info.pgid
           << " first map, acting " << acting
@@ -4330,10 +4344,7 @@ void OSD::build_past_intervals_parallel()
     dout(10) << __func__ << " after build_past_interval " << pg->info.pgid << " actual interval end " << apib.second << dendl;
   }
 
-  // we exit here for now?
-  // exit(1);
-
-
+  dout(10) << __func__ << " committing transactions. " << dendl;
 
   // write info only at the end.  this is necessary because we check
   // whether the past_intervals go far enough back or forward in time,
