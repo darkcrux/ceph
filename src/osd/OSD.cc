@@ -4204,7 +4204,7 @@ void OSD::build_past_intervals_parallel()
       }
 
       // Find the smallest starting point
-      cur_epoch = MIN(pg->info.epoch_created, pg->info.history.epoch_pool_created);
+      cur_epoch = MIN(pg->info.history.epoch_created, pg->info.history.epoch_pool_created);
       cur_epoch = MIN(cur_epoch, superblock.oldest_map);
 
       // Find the largest ending point
