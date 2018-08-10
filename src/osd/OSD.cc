@@ -4183,16 +4183,17 @@ void OSD::build_past_intervals_parallel()
       dout(10) << __func__ << " " << pg->info.pgid << " required interval start " << rpib.first << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " required interval end " << rpib.second << dendl;
       
+      auto apib = pg->past_intervals.get_bounds();
+
+      dout(10) << __func__ << " " << pg->info.pgid << " actual interval start " << apib.first << dendl;
+      dout(10) << __func__ << " " << pg->info.pgid << " actual interval end " << apib.second << dendl;
+      
       if (rpib.first >= rpib.second && pg->past_intervals.empty()) {
         if (pg->info.history.same_interval_since == 0) {
           pg->info.history.same_interval_since = rpib.second;
         }
         // continue;
       } else {
-      auto apib = pg->past_intervals.get_bounds();
-
-      dout(10) << __func__ << " " << pg->info.pgid << " actual interval start " << apib.first << dendl;
-      dout(10) << __func__ << " " << pg->info.pgid << " actual interval end " << apib.second << dendl;
 
       if (apib.second >= rpib.second &&
         apib.first <= rpib.first) {
