@@ -4218,8 +4218,8 @@ void OSD::build_past_intervals_parallel()
 
       if (rpib.first < cur_epoch)
         cur_epoch = rpib.first;
+      end_epoch = pg->info.history.same_interval_since - 1;
     }
-    end_epoch = pg->info.history.same_interval_since - 1;
   }
 
   
