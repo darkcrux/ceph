@@ -4212,18 +4212,17 @@ void OSD::build_past_intervals_parallel()
 
       pistate& p = pis[pg];
       p.old_pi = prev;
-      p.start = superblock.oldest_map;
-      p.end = end_epoch;
+      p.start = rpib.first;
+      p.end = pg->info.history.same_interval_since - 1;
       p.same_interval_since = 0;
 
       if (rpib.first < cur_epoch)
         cur_epoch = rpib.first;
-
-      // we use this as last so that it doesn't go past the boundary
-      end_epoch = pg->info.history.same_interval_since;
     }
   }
 
+  end_epoch = pg->info.history.same_interval_since - 1;
+  
   // nothing to rebuild.
   if (pis.empty()) {
     return;
