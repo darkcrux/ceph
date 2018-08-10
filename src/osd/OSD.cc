@@ -4213,7 +4213,7 @@ void OSD::build_past_intervals_parallel()
       pistate& p = pis[pg];
       p.old_pi = prev;
       p.start = rpib.first;
-      p.end = pg->info.history.same_interval_since;
+      p.end = pg->info.history.same_interval_since - 1;
       p.same_interval_since = 0;
 
       if (rpib.first < cur_epoch)
