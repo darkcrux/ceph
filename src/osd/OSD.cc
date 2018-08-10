@@ -4187,7 +4187,7 @@ void OSD::build_past_intervals_parallel()
 
       dout(10) << __func__ << " " << pg->info.pgid << " actual interval start " << apib.first << dendl;
       dout(10) << __func__ << " " << pg->info.pgid << " actual interval end " << apib.second << dendl;
-      
+
       if (rpib.first >= rpib.second && pg->past_intervals.empty()) {
         if (pg->info.history.same_interval_since == 0) {
           pg->info.history.same_interval_since = rpib.second;
@@ -4221,11 +4221,12 @@ void OSD::build_past_intervals_parallel()
       if (rpib.first < cur_epoch)
         cur_epoch = rpib.first;
 
-      if (rpib.second > end_epoch)
-        end_epoch = rpib.second;
-      // end_epoch = pg->info.history.same_interval_since - 1;
+      // if (rpib.second > end_epoch)
+      //   end_epoch = rpib.second;
+      // // end_epoch = pg->info.history.same_interval_since - 1;
     }
   }
+  end_epoch = superblock.newest_map;
 
   
   // nothing to rebuild.
