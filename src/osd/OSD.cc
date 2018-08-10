@@ -4187,7 +4187,7 @@ void OSD::build_past_intervals_parallel()
         if (pg->info.history.same_interval_since == 0) {
           pg->info.history.same_interval_since = rpib.second;
         }
-        // continue;
+        continue;
       } else {
       auto apib = pg->past_intervals.get_bounds();
 
@@ -4199,7 +4199,7 @@ void OSD::build_past_intervals_parallel()
           if (pg->info.history.same_interval_since == 0) {
             pg->info.history.same_interval_since = rpib.second;
           }
-          // continue;
+          continue;
         }
       }
 
@@ -4212,13 +4212,17 @@ void OSD::build_past_intervals_parallel()
 
       pistate& p = pis[pg];
       p.old_pi = prev;
-      p.start = rpib.first;
-      p.end = pg->info.history.same_interval_since - 1;
+      p.start = apib.first;
+      // p.end = pg->info.history.same_interval_since - 1;
+      p.end = rpib.second;
       p.same_interval_since = 0;
 
       if (rpib.first < cur_epoch)
         cur_epoch = rpib.first;
-      end_epoch = pg->info.history.same_interval_since - 1;
+
+      if (rpib.second > end_epoch)
+        end_epoch = rpib.second
+      // end_epoch = pg->info.history.same_interval_since - 1;
     }
   }
 
