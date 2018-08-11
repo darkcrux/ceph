@@ -4218,7 +4218,7 @@ void OSD::build_past_intervals_parallel()
 
       pistate& p = pis[pg];
       p.old_pi = prev;
-      p.start = rpib.first;
+      p.start = MIN(rpib.first, apib.first);
       p.end = rpib.second;
       p.same_interval_since = 0;
 
