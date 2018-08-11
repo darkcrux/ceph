@@ -4218,8 +4218,8 @@ void OSD::build_past_intervals_parallel()
 
       pistate& p = pis[pg];
       p.old_pi = prev;
-      // we're starting from when the PG was created.
-      p.start = pg->info.history.epoch_created;
+      // we're starting from epoch_pool_created.
+      p.start = pg->info.history.epoch_pool_created;
       p.end = rpib.second;
       p.same_interval_since = 0;
 
@@ -4294,8 +4294,6 @@ void OSD::build_past_intervals_parallel()
         recoverable.get(),
         &pg->past_intervals,
         &debug);
-
-      dout(10) << __func__ << " Is new interval? " << pg->info.pgid << " " << new_interval << dendl;
 
       if (new_interval) {
         dout(10) << __func__ << " epoch " << cur_epoch << " pg " << pg->info.pgid
