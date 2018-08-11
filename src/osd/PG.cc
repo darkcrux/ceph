@@ -1043,9 +1043,9 @@ map<pg_shard_t, pg_info_t>::const_iterator PG::find_best_info(
   for (map<pg_shard_t, pg_info_t>::const_iterator i = infos.begin();
        i != infos.end();
        ++i) {
-    // ignore PGs that have 0'0
-    if (i->second.last_update == eversion_t(0,0))
-      continue;
+    // // ignore PGs that have 0'0
+    // if (i->second.last_update == eversion_t(0,0))
+    //   continue;
     if (!cct->_conf->osd_find_best_info_ignore_history_les &&
 	max_last_epoch_started_found < i->second.history.last_epoch_started) {
       *history_les_bound = true;
@@ -1059,9 +1059,9 @@ map<pg_shard_t, pg_info_t>::const_iterator PG::find_best_info(
   for (map<pg_shard_t, pg_info_t>::const_iterator i = infos.begin();
        i != infos.end();
        ++i) {
-    // ignore PGs that have 0'0
-    if (i->second.last_update == eversion_t(0,0))
-      continue;
+    // // ignore PGs that have 0'0
+    // if (i->second.last_update == eversion_t(0,0))
+    //   continue;
     if (max_last_epoch_started_found <= i->second.last_epoch_started) {
       if (min_last_update_acceptable > i->second.last_update)
 	min_last_update_acceptable = i->second.last_update;
@@ -1078,9 +1078,9 @@ map<pg_shard_t, pg_info_t>::const_iterator PG::find_best_info(
   for (map<pg_shard_t, pg_info_t>::const_iterator p = infos.begin();
        p != infos.end();
        ++p) {
-    // ignore PGs that have 0'0
-    if (p->second.last_update == eversion_t(0,0))
-      continue;
+    // // ignore PGs that have 0'0
+    // if (p->second.last_update == eversion_t(0,0))
+    //   continue;
     if (restrict_to_up_acting && !is_up(p->first) &&
 	!is_acting(p->first))
       continue;
