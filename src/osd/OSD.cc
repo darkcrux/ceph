@@ -4177,8 +4177,8 @@ void OSD::build_past_intervals_parallel()
       // This sometimes causes the required_past_interval_bounds to go way past same_interval_since.
       // This adjusts it and avoids failing assert(interval.last > last)
       // The past intervals should be recreatd instead.
-      dout(10) << __func__ << " " << pg->info.pgid << "epoch created is larger than last epoch clean, will adjust" << dendl;
-      pg->info.history.epoch_pool_created = MIN(pg->info.history.last_epoch_clean, pg->info.history.epoch_pool_created);
+      // dout(10) << __func__ << " " << pg->info.pgid << "epoch created is larger than last epoch clean, will adjust" << dendl;
+      // pg->info.history.epoch_pool_created = MIN(pg->info.history.last_epoch_clean, pg->info.history.epoch_pool_created);
 
       auto rpib = pg->get_required_past_interval_bounds(
         pg->info,
@@ -4218,9 +4218,10 @@ void OSD::build_past_intervals_parallel()
 
       pistate& p = pis[pg];
       p.old_pi = prev;
-      // we're starting from epoch_pool_created.
-      p.start = pg->info.history.epoch_pool_created;
-      p.end = rpib.second;
+      // we start at which is lower, apib.first, rpib.first, or epoch_pool_created
+      p.start = MIN(MIN(apib.first, rpib.first), pg->info.history.epoch_pool_created);
+      // and end at same_interval_since
+      p.end = pg->info.history.same_interval_since;
       p.same_interval_since = 0;
 
       if (rpib.first < cur_epoch)
